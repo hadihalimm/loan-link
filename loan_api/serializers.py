@@ -7,8 +7,21 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_borrower', 'is_lender', 'balance']
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'is_borrower', 'is_lender', 'balance']
         read_only_fields = ['balance']
+
+    def create(self, validated_data):
+        user = User(
+            username = validated_data['username'],
+            email = validated_data['email'],
+            first_name = validated_data['first_name'],
+            last_name = validated_data['last_name'],
+            is_borrower = validated_data['is_borrower'],
+            is_lender = validated_data['is_lender']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 class LoanSerializer(serializers.ModelSerializer):
     borrower = serializers.StringRelatedField()
