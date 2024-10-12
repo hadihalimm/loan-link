@@ -6,7 +6,7 @@ from djmoney.models.fields import MoneyField
 class User(AbstractUser):
     is_borrower = models.BooleanField(default=False)
     is_lender = models.BooleanField(default=False)
-    balance = MoneyField(max_digits=19, decimal_places=4, default_currency='IDR')
+    balance = MoneyField(max_digits=19, decimal_places=4, default_currency='IDR', default=0)
 
     def __str__(self):
         return self.username
@@ -24,7 +24,7 @@ class Loan(models.Model):
     loan_amount = MoneyField(max_digits=19, decimal_places=4, default_currency='IDR')
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2)
     duration = models.IntegerField()
-    status = models.CharField(choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(choices=STATUS_CHOICES, max_length=20, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 
@@ -40,7 +40,7 @@ class Investment(models.Model):
         ('pending', 'Pending'),
         ('active', 'Active'),
         ('completed', 'Completed')
-    ])
+    ], max_length=20)
 
     def __str__(self):
         return f"Investment by {self.lender} in Loan {self.loan}"
@@ -54,7 +54,7 @@ class Repayment(models.Model):
         ('due', 'Due'),
         ('paid', 'Paid'),
         ('late', 'Late')
-    ])
+    ], max_length=20)
 
     def __str__(self):
         return f"Repayment for Loan {self.loan.pk} -- {self.status}"
@@ -70,7 +70,7 @@ class Transaction(models.Model):
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_transactions')
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_transactions')
     amount = MoneyField(max_digits=19, decimal_places=4, default_currency='IDR')
-    transaction_type = models.CharField(choices=TRANSACTION_TYPES)
+    transaction_type = models.CharField(choices=TRANSACTION_TYPES, max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -86,7 +86,7 @@ class LoanRequest(models.Model):
     borrower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='loan_requests')
     requested_amount = MoneyField(max_digits=19, decimal_places=4, default_currency='IDR')
     reason = models.TextField()
-    status = models.CharField(choices=REQUEST_STATUS_CHOICES)
+    status = models.CharField(choices=REQUEST_STATUS_CHOICES, max_length=20)
     created_at = models.DateTimeField()
 
     def __str__(self):
@@ -109,4 +109,4 @@ class PaymentPlan(models.Model):
         ('due', 'Due'),
         ('paid', 'Paid'),
         ('late', 'Late')
-    ])  
+    ], max_length=20)  
